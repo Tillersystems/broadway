@@ -73,7 +73,7 @@ class DomainMessageTest extends TestCase
      */
     public function it_merges_the_metadata_instances_on_andMetadata()
     {
-        $domainMessage = DomainMessage::recordNow('id', 'sid', 42, new Metadata('bar', 1337), 'payload', DateTime::now());
+        $domainMessage = DomainMessage::recordNow('id', 'sid', 42, Metadata::kv('bar', 1337), 'payload', DateTime::now());
 
         $newMessage = $domainMessage->andMetadata(Metadata::kv('foo', 42));
 
