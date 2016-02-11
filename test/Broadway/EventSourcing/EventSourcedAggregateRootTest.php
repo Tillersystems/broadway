@@ -11,6 +11,7 @@
 
 namespace Broadway\EventSourcing;
 
+use Broadway\Domain\DateTime;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
@@ -69,7 +70,7 @@ class EventSourcedAggregateRootTest extends TestCase
         $playhead = -1;
         foreach ($events as $event) {
             $playhead++;
-            $messages[] = DomainMessage::recordNow(1, $playhead, new Metadata(array()), $event);
+            $messages[] = DomainMessage::recordNow(1, 42, $playhead, new Metadata(array()), $event, DateTime::now());
         }
 
         return new DomainEventStream($messages);

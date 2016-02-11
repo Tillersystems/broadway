@@ -172,7 +172,7 @@ abstract class EventStoreManagementTest extends TestCase
     {
         $id = $this->getId($id);
 
-        return new DomainMessage((string) $id, (string) $playhead, new Metadata(array()), $event, $this->now);
+        return new DomainMessage((string) $id, 'shopId', (string) $playhead, new Metadata(array()), $event, $this->now, $this->now);
     }
 
     private function getId($id)

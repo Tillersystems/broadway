@@ -11,6 +11,7 @@
 
 namespace Broadway\EventSourcing\MetadataEnrichment;
 
+use Broadway\Domain\DateTime;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
@@ -89,8 +90,8 @@ class MetadataEnrichingEventStreamDecoratorTest extends TestCase
 
     private function createDomainEventStream()
     {
-        $m1 = DomainMessage::recordNow('id', 42, Metadata::kv('bar', 1337), 'payload');
-        $m2 = DomainMessage::recordNow('id', 42, Metadata::kv('bar', 1337), 'payload');
+        $m1 = DomainMessage::recordNow('id', 'shopid', 42, Metadata::kv('bar', 1337), 'payload', DateTime::now());
+        $m2 = DomainMessage::recordNow('id', 'shopid', 42, Metadata::kv('bar', 1337), 'payload', DateTime::now());
 
         return new DomainEventStream(array($m1, $m2));
     }

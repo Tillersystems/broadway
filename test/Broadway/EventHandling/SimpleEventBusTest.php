@@ -14,6 +14,7 @@ namespace Broadway\EventHandling;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
+use Broadway\Domain\DateTime;
 use Broadway\TestCase;
 
 class SimpleEventBusTest extends TestCase
@@ -146,7 +147,7 @@ class SimpleEventBusTest extends TestCase
 
     private function createDomainMessage($payload)
     {
-        return DomainMessage::recordNow(1, 1, new Metadata(array()), new SimpleEventBusTestEvent($payload));
+        return DomainMessage::recordNow(1, 1, 1, new Metadata(array()), new SimpleEventBusTestEvent($payload), DateTime::now());
     }
 }
 

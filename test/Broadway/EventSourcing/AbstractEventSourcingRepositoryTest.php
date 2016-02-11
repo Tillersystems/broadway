@@ -12,6 +12,7 @@
 namespace Broadway\EventSourcing;
 
 use Broadway\Domain\AggregateRoot;
+use Broadway\Domain\DateTime;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainEventStreamInterface;
 use Broadway\Domain\DomainMessage;
@@ -96,7 +97,7 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
     public function it_loads_an_aggregate()
     {
         $this->eventStore->append(42, new DomainEventStream(array(
-            DomainMessage::recordNow(42, 0, new Metadata(array()), new DidNumberEvent(1337))
+            DomainMessage::recordNow(42, 33, 0, new Metadata(array()), new DidNumberEvent(1337), DateTime::now())
         )));
 
         $aggregate = $this->repository->load(42);

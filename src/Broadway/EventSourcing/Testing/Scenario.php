@@ -74,7 +74,7 @@ class Scenario
         foreach ($givens as $event) {
             $playhead++;
             $messages[] = DomainMessage::recordNow(
-                $this->aggregateId, $playhead, new Metadata(array()), $event
+                $this->aggregateId, 'shopId', $playhead, new Metadata(array()), $event
             );
         }
 

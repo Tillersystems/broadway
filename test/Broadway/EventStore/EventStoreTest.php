@@ -144,7 +144,7 @@ abstract class EventStoreTest extends TestCase
 
     protected function createDomainMessage($id, $playhead, $recordedOn = null)
     {
-        return new DomainMessage($id, $playhead, new MetaData(array()), new Event(), $recordedOn ? $recordedOn : DateTime::now());
+        return new DomainMessage($id, 'shopId', $playhead, new MetaData(array()), new Event(), DateTime::now(), $recordedOn ? $recordedOn : DateTime::now());
     }
 }
 

@@ -12,6 +12,7 @@
 namespace Broadway\Saga;
 
 use Assert\Assertion as Assert;
+use Broadway\Domain\DateTime;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
 use Broadway\EventDispatcher\TraceableEventDispatcher;
@@ -247,7 +248,7 @@ class MultipleSagaManagerTest extends TestCase
 
     private function handleEvent($manager, $event)
     {
-        $manager->handle(DomainMessage::recordNow(1, 0, new Metadata(array()), $event));
+        $manager->handle(DomainMessage::recordNow(1, 2, 0, new Metadata(array()), $event), DateTime::now());
     }
 }
 

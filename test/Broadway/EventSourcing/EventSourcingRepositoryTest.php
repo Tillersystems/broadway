@@ -11,6 +11,7 @@
 
 namespace Broadway\EventSourcing;
 
+use Broadway\Domain\DateTime;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
@@ -48,7 +49,7 @@ class EventSourcingRepositoryTest extends AbstractEventSourcingRepositoryTest
         // make sure events exist in the event store
         $id = 'y0l0';
         $this->eventStore->append($id, new DomainEventStream(array(
-            DomainMessage::recordNow(42, 0, new Metadata(array()), new DidEvent())
+            DomainMessage::recordNow(42, 33, 0, new Metadata(array()), new DidEvent(), DateTime::now())
         )));
 
         $repository = $this->repositoryWithStaticAggregateFactory();
@@ -71,7 +72,7 @@ class EventSourcingRepositoryTest extends AbstractEventSourcingRepositoryTest
         // make sure events exist in the event store
         $id = 'y0l0';
         $this->eventStore->append($id, new DomainEventStream(array(
-            DomainMessage::recordNow(42, 0, new Metadata(array()), new DidEvent())
+            DomainMessage::recordNow(42, 'shopId', 0, new Metadata(array()), new DidEvent())
         )));
 
         $repository = $this->repositoryWithStaticAggregateFactory('someUnknownStaticmethod');

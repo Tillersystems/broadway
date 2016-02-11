@@ -71,7 +71,7 @@ class Scenario
         $playhead = -1;
         foreach ($events as $event) {
             $playhead++;
-            $messages[] = DomainMessage::recordNow($this->aggregateId, $playhead, new Metadata(array()), $event);
+            $messages[] = DomainMessage::recordNow($this->aggregateId, 'shopid', $playhead, new Metadata(array()), $event);
         }
 
         $this->eventStore->append($this->aggregateId, new DomainEventStream($messages));

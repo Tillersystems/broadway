@@ -143,8 +143,11 @@ final class DomainMessage
      *
      * @return DomainMessage
      */
-    public static function recordNow($id, $shopId, $playhead, Metadata $metadata, $payload, $happendOn)
+    public static function recordNow($id, $shopId, $playhead, Metadata $metadata, $payload, $happendOn = null)
     {
+        if ($happendOn === null) {
+            $happendOn = DateTime::now();
+        }
         return new DomainMessage($id, $shopId, $playhead, $metadata, $payload, $happendOn, DateTime::now());
     }
 

@@ -11,6 +11,7 @@
 
 namespace Broadway\Processor;
 
+use Broadway\Domain\DateTime;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
 use Broadway\TestCase;
@@ -34,7 +35,7 @@ class ProcessorTest extends TestCase
 
     private function createDomainMessage($event)
     {
-        return DomainMessage::recordNow(1, 1, new Metadata(array()), $event);
+        return DomainMessage::recordNow(1, 1, 1, new Metadata(array()), $event, DateTime::now());
     }
 }
 
