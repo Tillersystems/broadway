@@ -1,5 +1,5 @@
 {
-    "name": "broadway/broadway",
+    "name": "tillersystems/broadway",
     "description": "Infrastructure and testing helpers for creating CQRS and event sourced applications.",
     "keywords": ["cqrs", "event sourcing", "domain-driven design", "ddd"],
     "license": "MIT",
@@ -10,6 +10,10 @@
         "ramsey/uuid": "~2.4"
     },
     "authors": [
+      {
+        "name": "Vincent",
+        "email": "vincent@tillersystems.com"
+      },
       {
         "name": "Alexander",
         "email": "iam.asm89@gmail.com"
