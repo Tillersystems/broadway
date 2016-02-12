@@ -113,7 +113,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     {
         $data = array(
             'uuid' => $this->convertIdentifierToStorageValue((string) $domainMessage->getId()),
-            'shopId' => $domainMessage->getShopId(),
+            'shop_id' => $domainMessage->getShopId(),
             'playhead' => $domainMessage->getPlayhead(),
             'metadata' => json_encode($this->metadataSerializer->serialize($domainMessage->getMetadata())),
             'payload' => json_encode($this->payloadSerializer->serialize($domainMessage->getPayload())),
@@ -160,7 +160,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
 
         $table->addColumn('id', 'integer', array('autoincrement' => true));
         $table->addColumn('uuid', $uuidColumnDefinition['type'], $uuidColumnDefinition['params']);
-        $table->addColumn('shop_id', 'string', array('length' => 128));
+        $table->addColumn('shop_id', 'string', array('length' => 64));
         $table->addColumn('playhead', 'integer', array('unsigned' => true));
         $table->addColumn('payload', 'text');
         $table->addColumn('metadata', 'text');
@@ -190,7 +190,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     private function deserializeEvent($row)
     {
         return new DomainMessage(
-                $this->convertStorageValueToIdentifier($row['uuid']), $row['shopId'], $row['playhead'], $this->metadataSerializer->deserialize(json_decode($row['metadata'], true)), $this->payloadSerializer->deserialize(json_decode($row['payload'], true)), DateTime::fromString($row['happened_on']), DateTime::fromString($row['recorded_on'])
+                $this->convertStorageValueToIdentifier($row['uuid']), $row['shop_id'], $row['playhead'], $this->metadataSerializer->deserialize(json_decode($row['metadata'], true)), $this->payloadSerializer->deserialize(json_decode($row['payload'], true)), DateTime::fromString($row['happened_on']), DateTime::fromString($row['recorded_on'])
         );
     }
 
