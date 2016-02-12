@@ -22,6 +22,9 @@ use Broadway\Domain\Metadata;
  */
 abstract class EventSourcedAggregateRoot implements AggregateRootInterface
 {
+    private $shopIdMethod = 'getShopId';
+    private $happendOnMethod = 'happendOnMethod';
+    
     /**
      * @var array
      */
@@ -36,14 +39,27 @@ abstract class EventSourcedAggregateRoot implements AggregateRootInterface
     public function apply($event)
     {
         $this->handleRecursively($event);
+        
+        if (method_exists($event, $this->shopIdMethod)) {
+            $shopId = $event->{$this->shopIdMethod}();
+        } else {
+            $shopId = null;
+        }
+        
+        if (method_exists($event, $this->happendOnMethod)) {
+            $happendOnMethod = $event->{$this->happendOnMethod}();
+        } else {
+            $happendOnMethod = null;
+        }
 
         $this->playhead++;
         $this->uncommittedEvents[] = DomainMessage::recordNow(
             $this->getAggregateRootId(),
-            'shopId', //TODO: set shop id
+            $shopId,
             $this->playhead,
             new Metadata(array()),
-            $event
+            $event,
+            $happendOnMethod
         );
     }
 
