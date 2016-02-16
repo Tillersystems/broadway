@@ -113,7 +113,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     {
         $data = array(
             'uuid' => $this->convertIdentifierToStorageValue((string) $domainMessage->getId()),
-            'private_uuid' => $domainMessage->getPrivateUuid(),
+            'private_uuid' => $domainMessage->getPrivateId(),
             'shop_id' => $domainMessage->getShopId(),
             'metadata' => json_encode($this->metadataSerializer->serialize($domainMessage->getMetadata())),
             'payload' => json_encode($this->payloadSerializer->serialize($domainMessage->getPayload())),
