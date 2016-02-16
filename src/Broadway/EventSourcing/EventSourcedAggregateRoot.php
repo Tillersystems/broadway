@@ -16,50 +16,34 @@ use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainEventStreamInterface;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
+use Broadway\EventSourcing\EventInterface;
 
 /**
  * Convenience base class for event sourced aggregate roots.
  */
 abstract class EventSourcedAggregateRoot implements AggregateRootInterface
 {
-    private $shopIdMethod = 'getShopId';
-    private $happendOnMethod = 'happendOnMethod';
-    
     /**
      * @var array
      */
     private $uncommittedEvents = array();
-    private $playhead          = -1; // 0-based playhead allows events[0] to contain playhead 0
 
     /**
      * Applies an event. The event is added to the AggregateRoot's list of uncommitted events.
      *
      * @param $event
      */
-    public function apply($event)
+    public function apply(EventInterface $event)
     {
         $this->handleRecursively($event);
-        
-        if (method_exists($event, $this->shopIdMethod)) {
-            $shopId = $event->{$this->shopIdMethod}();
-        } else {
-            $shopId = null;
-        }
-        
-        if (method_exists($event, $this->happendOnMethod)) {
-            $happendOnMethod = $event->{$this->happendOnMethod}();
-        } else {
-            $happendOnMethod = null;
-        }
 
-        $this->playhead++;
         $this->uncommittedEvents[] = DomainMessage::recordNow(
-            $this->getAggregateRootId(),
-            $shopId,
-            $this->playhead,
-            new Metadata(array()),
-            $event,
-            $happendOnMethod
+                $this->getAggregateRootId(), 
+                $event->getEventId(), 
+                $event->getShopId(), 
+                new Metadata(array()),
+                $event, 
+                $event->getHappenedOn()
         );
     }
 
@@ -81,7 +65,6 @@ abstract class EventSourcedAggregateRoot implements AggregateRootInterface
     public function initializeState(DomainEventStreamInterface $stream)
     {
         foreach ($stream as $message) {
-            $this->playhead++;
             $this->handleRecursively($message->getPayload());
         }
     }
@@ -95,7 +78,7 @@ abstract class EventSourcedAggregateRoot implements AggregateRootInterface
     {
         $method = $this->getApplyMethod($event);
 
-        if (! method_exists($this, $method)) {
+        if (!method_exists($this, $method)) {
             return;
         }
 
