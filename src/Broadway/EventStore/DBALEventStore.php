@@ -180,7 +180,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
             $query = 'SELECT uuid, private_uuid, shop_id, metadata, payload, happened_on, recorded_on
                 FROM ' . $this->tableName . '
                 WHERE uuid = ?
-                ORDER BY playhead ASC';
+                ORDER BY happened_on ASC';
             $this->loadStatement = $this->connection->prepare($query);
         }
 
@@ -239,7 +239,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     private function prepareVisitEventsStatement(Criteria $criteria)
     {
         list ($where, $bindValues, $bindValueTypes) = $this->prepareVisitEventsStatementWhereAndBindValues($criteria);
-        $query = 'SELECT uuid, shop_id, playhead, metadata, payload, happened_on, recorded_on
+        $query = 'SELECT uuid, private_id, shop_id, metadata, payload, happened_on, recorded_on
             FROM ' . $this->tableName . '
             ' . $where . '
             ORDER BY id ASC';
