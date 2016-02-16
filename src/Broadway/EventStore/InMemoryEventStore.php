@@ -51,18 +51,18 @@ class InMemoryEventStore implements EventStoreInterface, EventStoreManagementInt
         }
 
         foreach ($eventStream as $event) {
-            $playhead = $event->getPlayhead();
-            $this->assertPlayhead($this->events[$id], $playhead);
+            $privateId = $event->getPrivateId();
+            $this->assertPrivateId($this->events[$id], $privateId);
 
-            $this->events[$id][$playhead] = $event;
+            $this->events[$id][$privateId] = $event;
         }
     }
 
-    private function assertPlayhead($events, $playhead)
+    private function assertPrivateId($events, $privateId)
     {
-        if (isset($events[$playhead])) {
+        if (isset($events[$privateId])) {
             throw new InMemoryEventStoreException(
-                sprintf("An event with playhead '%d' is already committed.", $playhead)
+                sprintf("An event with privateId '%d' is already committed.", $privateId)
             );
         }
     }
