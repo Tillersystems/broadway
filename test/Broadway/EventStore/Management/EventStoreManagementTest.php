@@ -168,11 +168,11 @@ abstract class EventStoreManagementTest extends TestCase
         );
     }
 
-    private function createDomainMessage($id, $playhead, $event)
+    private function createDomainMessage($id, $privateId, $event)
     {
         $id = $this->getId($id);
 
-        return new DomainMessage((string) $id, 'shopId', (string) $playhead, new Metadata(array()), $event, $this->now, $this->now);
+        return new DomainMessage((string) $id, (string) $privateId, 'shopId', new Metadata(array()), $event, $this->now, $this->now);
     }
 
     private function getId($id)

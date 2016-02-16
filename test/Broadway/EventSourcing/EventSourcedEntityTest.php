@@ -12,6 +12,8 @@
 namespace Broadway\EventSourcing;
 
 use Broadway\TestCase;
+use Broadway\Domain\DateTime;
+use Broadway\EventSourcing\EventInterface;
 
 class EventSourcedEntityTest extends TestCase
 {
@@ -126,6 +128,21 @@ class Entity extends EventSourcedEntity
     }
 }
 
-class Event
+class Event implements EventInterface
 {
+
+    public function getEventId()
+    {
+        return "eventid";
+    }
+
+    public function getShopId()
+    {
+        return "shopid";
+    }
+
+    public function getHappenedOn()
+    {
+        return DateTime::now();
+    }
 }

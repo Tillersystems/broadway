@@ -16,42 +16,10 @@ use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
 use Broadway\TestCase;
+use Broadway\EventSourcing\EventInterface;
 
 class EventSourcedAggregateRootTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function it_applies_using_an_incrementing_playhead()
-    {
-        $aggregateRoot = new MyTestAggregateRoot();
-        $aggregateRoot->apply(new AggregateEvent());
-        $aggregateRoot->apply(new AggregateEvent());
-        $eventStream = $aggregateRoot->getUncommittedEvents();
-
-        $i = 0;
-        foreach ($eventStream as $domainMessage) {
-            $this->assertEquals($i, $domainMessage->getPlayhead());
-            $i++;
-        }
-        $this->assertEquals(2, $i);
-    }
-
-    /**
-     * @test
-     */
-    public function it_sets_internal_playhead_when_initializing()
-    {
-        $aggregateRoot = new MyTestAggregateRoot();
-        $aggregateRoot->initializeState($this->toDomainEventStream(array(new AggregateEvent())));
-
-        $aggregateRoot->apply(new AggregateEvent());
-
-        $eventStream = $aggregateRoot->getUncommittedEvents();
-        foreach ($eventStream as $domainMessage) {
-            $this->assertEquals(1, $domainMessage->getPlayhead());
-        }
-    }
 
     /**
      * @test
@@ -67,10 +35,10 @@ class EventSourcedAggregateRootTest extends TestCase
     private function toDomainEventStream(array $events)
     {
         $messages = array();
-        $playhead = -1;
+        $privateId = -1;
         foreach ($events as $event) {
-            $playhead++;
-            $messages[] = DomainMessage::recordNow(1, 42, $playhead, new Metadata(array()), $event, DateTime::now());
+            $privateId++;
+            $messages[] = DomainMessage::recordNow(1, $privateId, 42, new Metadata(array()), $event, DateTime::now());
         }
 
         return new DomainEventStream($messages);
@@ -92,6 +60,21 @@ class MyTestAggregateRoot extends EventSourcedAggregateRoot
     }
 }
 
-class AggregateEvent
+class AggregateEvent implements EventInterface
 {
+
+    public function getEventId()
+    {
+        return "eventid";
+    }
+
+    public function getShopId()
+    {
+        return "shopid";
+    }
+
+    public function getHappenedOn()
+    {
+        return DateTime::now();
+    }
 }

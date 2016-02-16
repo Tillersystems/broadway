@@ -192,13 +192,28 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
     abstract protected function createAggregate();
 }
 
-class DidNumberEvent
+class DidNumberEvent implements EventInterface
 {
     public $number;
 
     public function __construct($number)
     {
         $this->number = $number;
+    }
+
+    public function getEventId()
+    {
+        return "eventid-" . $this->number;
+    }
+
+    public function getShopId()
+    {
+        return "shopid";
+    }
+
+    public function getHappenedOn()
+    {
+        return DateTime::now();
     }
 }
 

@@ -142,9 +142,9 @@ abstract class EventStoreTest extends TestCase
         );
     }
 
-    protected function createDomainMessage($id, $playhead, $recordedOn = null)
+    protected function createDomainMessage($id, $privateId, $recordedOn = null)
     {
-        return new DomainMessage($id, 'shopId', $playhead, new MetaData(array()), new Event(), DateTime::now(), $recordedOn ? $recordedOn : DateTime::now());
+        return new DomainMessage($id, $privateId, 'shopId', new MetaData(array()), new Event(), DateTime::now(), $recordedOn ? $recordedOn : DateTime::now());
     }
 }
 
