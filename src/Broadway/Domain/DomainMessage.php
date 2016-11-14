@@ -20,7 +20,12 @@ final class DomainMessage
      * @var string
      */
     private $id;
-    
+
+    /**
+     * @var id
+     */
+    private $playhead;
+
     /**
      * @var string
      */
@@ -52,17 +57,19 @@ final class DomainMessage
     private $recordedOn;
 
     /**
-     * @param string   $id
-     * @param string   $privateId
-     * @param string   $shopId
+     * @param string $id
+     * @param int $playhead
+     * @param string $privateId
+     * @param string $shopId
      * @param Metadata $metadata
-     * @param mixed    $payload
+     * @param mixed $payload
      * @param DateTime $happenedOn
      * @param DateTime $recordedOn
      */
-    public function __construct($id, $privateId, $shopId, Metadata $metadata, $payload, DateTime $happenedOn, DateTime $recordedOn)
+    public function __construct($id, $playhead, $privateId, $shopId, Metadata $metadata, $payload, DateTime $happenedOn, DateTime $recordedOn)
     {
         $this->id         = $id;
+        $this->playhead   = $playhead;
         $this->privateId  = $privateId;
         $this->shopId     = $shopId;
         $this->metadata   = $metadata;
@@ -77,6 +84,14 @@ final class DomainMessage
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPlayhead()
+    {
+        return $this->playhead;
     }
 
     /**
@@ -144,12 +159,12 @@ final class DomainMessage
      *
      * @return DomainMessage
      */
-    public static function recordNow($id, $privateId, $shopId, Metadata $metadata, $payload, $happendOn = null)
+    public static function recordNow($id, $playhead, $privateId, $shopId, Metadata $metadata, $payload, $happendOn = null)
     {
         if ($happendOn === null) {
             $happendOn = DateTime::now();
         }
-        return new DomainMessage($id, $privateId, $shopId, $metadata, $payload, $happendOn, DateTime::now());
+        return new DomainMessage($id, $playhead, $privateId, $shopId, $metadata, $payload, $happendOn, DateTime::now());
     }
 
     /**
@@ -163,6 +178,6 @@ final class DomainMessage
     {
         $newMetadata = $this->metadata->merge($metadata);
 
-        return new DomainMessage($this->id, $this->privateId, $this->shopId, $newMetadata, $this->payload, $this->happenedOn, $this->recordedOn);
+        return new DomainMessage($this->id, $this->playhead, $this->privateId, $this->shopId, $newMetadata, $this->payload, $this->happenedOn, $this->recordedOn);
     }
 }

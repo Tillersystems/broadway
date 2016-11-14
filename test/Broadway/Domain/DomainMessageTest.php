@@ -24,11 +24,12 @@ class DomainMessageTest extends TestCase
         $privateId  = 'Hi thor';
         $shopId     = 'Hi thar';
         $payload    = new SomeEvent();
+        $playhead = 15;
         $metadata   = new Metadata(array('meta'));
         $type       = 'Broadway.Domain.SomeEvent';
         $happenedOn = DateTime::now();
 
-        $domainMessage = DomainMessage::recordNow($id, $privateId, $shopId, $metadata, $payload, $happenedOn);
+        $domainMessage = DomainMessage::recordNow($id, $playhead, $privateId, $shopId, $metadata, $payload, $happenedOn);
 
         $this->assertEquals($id,         $domainMessage->getId());
         $this->assertEquals($privateId,  $domainMessage->getPrivateId());
@@ -44,7 +45,7 @@ class DomainMessageTest extends TestCase
      */
     public function it_returns_a_new_instance_with_more_metadata_on_andMetadata()
     {
-        $domainMessage = DomainMessage::recordNow('id', 'sid', 42, new Metadata(), 'payload', DateTime::now());
+        $domainMessage = DomainMessage::recordNow('id', 42, 'sid', 42, new Metadata(), 'payload', DateTime::now());
 
         $this->assertNotSame($domainMessage, $domainMessage->andMetadata(Metadata::kv('foo', 42)));
     }
@@ -54,11 +55,12 @@ class DomainMessageTest extends TestCase
      */
     public function it_keeps_all_data_the_same_expect_metadata_on_andMetadata()
     {
-        $domainMessage = DomainMessage::recordNow('id', 'sid', 42, new Metadata(), 'payload', DateTime::now());
+        $domainMessage = DomainMessage::recordNow('id', 42, 'sid', 42, new Metadata(), 'payload', DateTime::now());
 
         $newMessage = $domainMessage->andMetadata(Metadata::kv('foo', 42));
 
         $this->assertSame($domainMessage->getId(), $newMessage->getId());
+        $this->assertSame($domainMessage->getPlayhead(), $newMessage->getPlayhead());
         $this->assertSame($domainMessage->getPrivateId(), $newMessage->getPrivateId());
         $this->assertSame($domainMessage->getShopId(), $newMessage->getShopId());
         $this->assertSame($domainMessage->getPayload(), $newMessage->getPayload());
@@ -73,7 +75,7 @@ class DomainMessageTest extends TestCase
      */
     public function it_merges_the_metadata_instances_on_andMetadata()
     {
-        $domainMessage = DomainMessage::recordNow('id', 'sid', 42, Metadata::kv('bar', 1337), 'payload', DateTime::now());
+        $domainMessage = DomainMessage::recordNow('id', 42, 'sid', 42, Metadata::kv('bar', 1337), 'payload', DateTime::now());
 
         $newMessage = $domainMessage->andMetadata(Metadata::kv('foo', 42));
 

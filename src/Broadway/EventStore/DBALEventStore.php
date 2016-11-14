@@ -113,6 +113,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     {
         $data = array(
             'uuid' => $this->convertIdentifierToStorageValue((string) $domainMessage->getId()),
+            'playhead' => $domainMessage->getPlayhead(),
             'private_uuid' => $domainMessage->getPrivateId(),
             'shop_id' => $domainMessage->getShopId(),
             'metadata' => json_encode($this->metadataSerializer->serialize($domainMessage->getMetadata())),
@@ -160,6 +161,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
 
         $table->addColumn('id', 'integer', array('autoincrement' => true));
         $table->addColumn('uuid', $uuidColumnDefinition['type'], $uuidColumnDefinition['params']);
+        $table->addColumn('playhead', 'integer', array('unsigned' => true));
         $table->addColumn('private_uuid', $uuidColumnDefinition['type'], $uuidColumnDefinition['params']);
         $table->addColumn('shop_id', 'string', array('length' => 64));
         $table->addColumn('payload', 'text');
@@ -169,7 +171,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
         $table->addColumn('type', 'text');
 
         $table->setPrimaryKey(array('id'));
-        $table->addUniqueIndex(array('uuid', 'private_uuid', 'shop_id'));
+        $table->addUniqueIndex(array('uuid', 'playhead', 'private_uuid', 'shop_id'));
 
         return $table;
     }
@@ -177,10 +179,10 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     private function prepareLoadStatement()
     {
         if (null === $this->loadStatement) {
-            $query = 'SELECT uuid, private_uuid, shop_id, metadata, payload, happened_on, recorded_on
+            $query = 'SELECT uuid, playhead, private_uuid, shop_id, metadata, payload, happened_on, recorded_on
                 FROM ' . $this->tableName . '
                 WHERE uuid = ?
-                ORDER BY happened_on ASC';
+                ORDER BY playhead ASC';
             $this->loadStatement = $this->connection->prepare($query);
         }
 
@@ -190,7 +192,14 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     private function deserializeEvent($row)
     {
         return new DomainMessage(
-                $this->convertStorageValueToIdentifier($row['uuid']), $row['private_uuid'], $row['shop_id'], $this->metadataSerializer->deserialize(json_decode($row['metadata'], true)), $this->payloadSerializer->deserialize(json_decode($row['payload'], true)), DateTime::fromString($row['happened_on']), DateTime::fromString($row['recorded_on'])
+                $this->convertStorageValueToIdentifier($row['uuid']),
+                $row['playhead'],
+                $row['private_uuid'],
+                $row['shop_id'],
+                $this->metadataSerializer->deserialize(json_decode($row['metadata'], true)),
+                $this->payloadSerializer->deserialize(json_decode($row['payload'], true)),
+                DateTime::fromString($row['happened_on']),
+                DateTime::fromString($row['recorded_on'])
         );
     }
 
@@ -239,7 +248,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     private function prepareVisitEventsStatement(Criteria $criteria)
     {
         list ($where, $bindValues, $bindValueTypes) = $this->prepareVisitEventsStatementWhereAndBindValues($criteria);
-        $query = 'SELECT uuid, private_id, shop_id, metadata, payload, happened_on, recorded_on
+        $query = 'SELECT uuid, playhead, private_id, shop_id, metadata, payload, happened_on, recorded_on
             FROM ' . $this->tableName . '
             ' . $where . '
             ORDER BY id ASC';

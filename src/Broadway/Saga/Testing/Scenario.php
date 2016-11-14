@@ -79,6 +79,6 @@ class Scenario
     {
         $this->playhead++;
 
-        return DomainMessage::recordNow(1, 'shopId', $this->playhead, new Metadata(array()), $event);
+        return DomainMessage::recordNow(1, $this->playhead, $this->playhead, 'shopId', new Metadata(array()), $event);
     }
 }
