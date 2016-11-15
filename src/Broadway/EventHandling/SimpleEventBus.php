@@ -19,8 +19,8 @@ use Exception;
  */
 class SimpleEventBus implements EventBusInterface
 {
-    private $eventListeners = array();
-    private $queue          = array();
+    private $eventListeners = [];
+    private $queue          = [];
     private $isPublishing   = false;
 
     /**
@@ -49,11 +49,8 @@ class SimpleEventBus implements EventBusInterface
                         $eventListener->handle($domainMessage);
                     }
                 }
-
+            } finally {
                 $this->isPublishing = false;
-            } catch (Exception $e) {
-                $this->isPublishing = false;
-                throw $e;
             }
         }
     }

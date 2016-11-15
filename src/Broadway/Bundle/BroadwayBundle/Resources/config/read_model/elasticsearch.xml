@@ -6,10 +6,11 @@
 
     <services>
         <service id="broadway.elasticsearch.client" class="Elasticsearch\Client">
+            <factory service="broadway.elasticsearch.client_factory" method="create" />
             <argument>%elasticsearch%</argument>
         </service>
 
-        <service id="broadway.serializer.readmodel" class="Broadway\Serializer\SimpleInterfaceSerializer" />
+        <service id="broadway.elasticsearch.client_factory" class="Broadway\ReadModel\ElasticSearch\ElasticSearchClientFactory" public="false" />
 
         <service id="broadway.read_model.elasticsearch.repository_factory" class="Broadway\ReadModel\ElasticSearch\ElasticSearchRepositoryFactory">
             <argument type="service" id="broadway.elasticsearch.client" />

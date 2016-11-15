@@ -70,13 +70,13 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
         $statement->bindValue(1, $this->convertIdentifierToStorageValue($id));
         $statement->execute();
 
-        $events = array();
+        $events = [];
         while ($row = $statement->fetch()) {
             $events[] = $this->deserializeEvent($row);
         }
 
         if (empty($events)) {
-            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s', $id));
+            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s for table %s', $id, $this->tableName));
         }
 
         return new DomainEventStream($events);
@@ -103,7 +103,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
 
             $this->connection->commit();
         } catch (DBALException $exception) {
-            $this->connection->rollback();
+            $this->connection->rollBack();
 
             throw DBALEventStoreException::create($exception);
         }
@@ -111,7 +111,8 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
 
     private function insertMessage(Connection $connection, DomainMessage $domainMessage)
     {
-        $data = array(
+
+        $data = [
             'uuid' => $this->convertIdentifierToStorageValue((string) $domainMessage->getId()),
             'playhead' => $domainMessage->getPlayhead(),
             'private_uuid' => $domainMessage->getPrivateId(),
@@ -121,7 +122,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
             'happened_on' => $domainMessage->getHappenedOn()->toString(),
             'recorded_on' => $domainMessage->getRecordedOn()->toString(),
             'type' => $domainMessage->getType(),
-        );
+        ];
 
         $connection->insert($this->tableName, $data);
     }
@@ -142,24 +143,24 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     {
         $schema = new Schema();
 
-        $uuidColumnDefinition = array(
-            'type' => 'guid',
-            'params' => array(
+        $uuidColumnDefinition = [
+            'type'   => 'guid',
+            'params' => [
                 'length' => 36,
-            ),
-        );
+            ],
+        ];
 
         if ($this->useBinary) {
-            $uuidColumnDefinition['type'] = 'binary';
-            $uuidColumnDefinition['params'] = array(
+            $uuidColumnDefinition['type']   = 'binary';
+            $uuidColumnDefinition['params'] = [
                 'length' => 16,
-                'fixed' => true,
-            );
+                'fixed'  => true,
+            ];
         }
 
         $table = $schema->createTable($this->tableName);
 
-        $table->addColumn('id', 'integer', array('autoincrement' => true));
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('uuid', $uuidColumnDefinition['type'], $uuidColumnDefinition['params']);
         $table->addColumn('playhead', 'integer', array('unsigned' => true));
         $table->addColumn('private_uuid', $uuidColumnDefinition['type'], $uuidColumnDefinition['params']);
@@ -170,8 +171,8 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
         $table->addColumn('recorded_on', 'string', array('length' => 32));
         $table->addColumn('type', 'text');
 
-        $table->setPrimaryKey(array('id'));
-        $table->addUniqueIndex(array('uuid', 'playhead', 'private_uuid', 'shop_id'));
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['uuid', 'playhead', 'private_uuid', 'shop_id']);
 
         return $table;
     }
@@ -247,6 +248,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
 
     private function prepareVisitEventsStatement(Criteria $criteria)
     {
+
         list ($where, $bindValues, $bindValueTypes) = $this->prepareVisitEventsStatementWhereAndBindValues($criteria);
         $query = 'SELECT uuid, playhead, private_id, shop_id, metadata, payload, happened_on, recorded_on
             FROM ' . $this->tableName . '
@@ -266,38 +268,38 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
             );
         }
 
-        $bindValues = array();
-        $bindValueTypes = array();
+        $bindValues     = [];
+        $bindValueTypes = [];
 
-        $criteriaTypes = array();
+        $criteriaTypes = [];
 
         if ($criteria->getAggregateRootIds()) {
             $criteriaTypes[] = 'uuid IN (:uuids)';
 
             if ($this->useBinary) {
-                $bindValues['uuids'] = array();
+                $bindValues['uuids'] = [];
                 foreach ($criteria->getAggregateRootIds() as $id) {
                     $bindValues['uuids'][] = $this->convertIdentifierToStorageValue($id);
                 }
                 $bindValueTypes['uuids'] = Connection::PARAM_STR_ARRAY;
             } else {
-                $bindValues['uuids'] = $criteria->getAggregateRootIds();
+                $bindValues['uuids']     = $criteria->getAggregateRootIds();
                 $bindValueTypes['uuids'] = Connection::PARAM_STR_ARRAY;
             }
         }
 
         if ($criteria->getEventTypes()) {
-            $criteriaTypes[] = 'type IN (:types)';
-            $bindValues['types'] = $criteria->getEventTypes();
+            $criteriaTypes[]         = 'type IN (:types)';
+            $bindValues['types']     = $criteria->getEventTypes();
             $bindValueTypes['types'] = Connection::PARAM_STR_ARRAY;
         }
 
-        if (!$criteriaTypes) {
-            return array('', array(), array());
+        if (! $criteriaTypes) {
+            return ['', [], []];
         }
 
         $where = 'WHERE ' . join(' AND ', $criteriaTypes);
 
-        return array($where, $bindValues, $bindValueTypes);
+        return [$where, $bindValues, $bindValueTypes];
     }
 }

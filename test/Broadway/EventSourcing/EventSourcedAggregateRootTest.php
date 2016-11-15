@@ -24,10 +24,44 @@ class EventSourcedAggregateRootTest extends TestCase
     /**
      * @test
      */
+    public function it_applies_using_an_incrementing_playhead()
+    {
+        $aggregateRoot = new MyTestAggregateRoot();
+        $aggregateRoot->apply(new AggregateEvent());
+        $aggregateRoot->apply(new AggregateEvent());
+        $eventStream = $aggregateRoot->getUncommittedEvents();
+
+        $i = 0;
+        foreach ($eventStream as $domainMessage) {
+            $this->assertEquals($i, $domainMessage->getPlayhead());
+            $i++;
+        }
+        $this->assertEquals(2, $i);
+    }
+
+    /**
+     * @test
+     */
+    public function it_sets_internal_playhead_when_initializing()
+    {
+        $aggregateRoot = new MyTestAggregateRoot();
+        $aggregateRoot->initializeState($this->toDomainEventStream([new AggregateEvent()]));
+
+        $aggregateRoot->apply(new AggregateEvent());
+
+        $eventStream = $aggregateRoot->getUncommittedEvents();
+        foreach ($eventStream as $domainMessage) {
+            $this->assertEquals(1, $domainMessage->getPlayhead());
+        }
+    }
+
+    /**
+     * @test
+     */
     public function it_calls_apply_for_specific_events()
     {
         $aggregateRoot = new MyTestAggregateRoot();
-        $aggregateRoot->initializeState($this->toDomainEventStream(array(new AggregateEvent())));
+        $aggregateRoot->initializeState($this->toDomainEventStream([new AggregateEvent()]));
 
         $this->assertTrue($aggregateRoot->isCalled);
     }
@@ -38,7 +72,7 @@ class EventSourcedAggregateRootTest extends TestCase
         $privateId = -1;
         foreach ($events as $event) {
             $privateId++;
-            $messages[] = DomainMessage::recordNow(1, $privateId, 42, new Metadata(array()), $event, DateTime::now());
+            $messages[] = DomainMessage::recordNow(1, $privateId, $privateId, 42, new Metadata([]), $event, DateTime::now());
         }
 
         return new DomainEventStream($messages);

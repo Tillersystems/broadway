@@ -37,7 +37,7 @@ class MultipleSagaManagerTest extends TestCase
     public function setUp()
     {
         $this->repository      = new TraceableSagaStateRepository(new InMemoryRepository());
-        $this->sagas           = array('sagaId' => new SagaManagerTestSaga());
+        $this->sagas           = ['sagaId' => new SagaManagerTestSaga()];
         $this->stateManager    = new StateManager($this->repository, new Version4Generator());
         $this->metadataFactory = new StaticallyConfiguredSagaMetadataFactory();
         $this->eventDispatcher = new TraceableEventDispatcher();
@@ -129,7 +129,7 @@ class MultipleSagaManagerTest extends TestCase
      */
     public function it_calls_all_sagas_configured_for_that_event()
     {
-        $sagas   = array(new SagaManagerTestSaga(), new SagaManagerTestSaga());
+        $sagas   = [new SagaManagerTestSaga(), new SagaManagerTestSaga()];
         $manager = $this->createManager($this->repository, $sagas, $this->stateManager, $this->metadataFactory, $this->eventDispatcher);
 
         foreach ($sagas as $saga) {
@@ -152,7 +152,7 @@ class MultipleSagaManagerTest extends TestCase
         $s1->set('appId', 42);
         $this->repository->save($s1, 'saga2');
 
-        $sagas   = array('saga1' => new SagaManagerTestSaga(), 'saga2' => new SagaManagerTestSaga());
+        $sagas   = ['saga1' => new SagaManagerTestSaga(), 'saga2' => new SagaManagerTestSaga()];
         $manager = $this->createManager($this->repository, $sagas, $this->stateManager, $this->metadataFactory, $this->eventDispatcher);
 
         $this->assertFalse($sagas['saga2']->isCalled);
@@ -174,7 +174,7 @@ class MultipleSagaManagerTest extends TestCase
         $s2->set('appId', 42);
         $this->repository->save($s2, 'saga2');
 
-        $sagas   = array('saga1' => new SagaManagerTestSaga(), 'saga2' => new SagaManagerTestSaga());
+        $sagas   = ['saga1' => new SagaManagerTestSaga(), 'saga2' => new SagaManagerTestSaga()];
         $manager = $this->createManager($this->repository, $sagas, $this->stateManager, $this->metadataFactory, $this->eventDispatcher);
 
         $this->repository->trace();
@@ -248,7 +248,7 @@ class MultipleSagaManagerTest extends TestCase
 
     private function handleEvent($manager, $event)
     {
-        $manager->handle(DomainMessage::recordNow(1, 2, 0, new Metadata(array()), $event), DateTime::now());
+        $manager->handle(DomainMessage::recordNow(1, 1, 2, 0, new Metadata([]), $event), DateTime::now());
     }
 }
 
@@ -272,11 +272,11 @@ class SagaManagerTestSaga implements StaticallyConfiguredSagaInterface
 
     public static function configuration()
     {
-        return array(
-            'TestEvent1'    => function () { return new Criteria(array('appId' => 42)); },
-            'TestEvent2'    => function () { },
-            'TestEventDone' => function () { return new Criteria(array('appId' => 42)); },
-        );
+        return [
+            'TestEvent1'    => function () { return new Criteria(['appId' => 42]); },
+            'TestEvent2'                                                  => function () { },
+            'TestEventDone'                                               => function () { return new Criteria(['appId' => 42]); },
+        ];
     }
 }
 
@@ -297,8 +297,8 @@ class TraceableSagaStateRepository implements RepositoryInterface
 {
     private $tracing = false;
     private $repository;
-    private $saved   = array();
-    private $removed = array();
+    private $saved   = [];
+    private $removed = [];
 
     public function __construct(RepositoryInterface $repository)
     {

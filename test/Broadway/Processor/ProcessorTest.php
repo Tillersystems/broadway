@@ -35,7 +35,7 @@ class ProcessorTest extends TestCase
 
     private function createDomainMessage($event)
     {
-        return DomainMessage::recordNow(1, 1, 1, new Metadata(array()), $event, DateTime::now());
+        return DomainMessage::recordNow(1, 1, 1, 1, new Metadata([]), $event, DateTime::now());
     }
 }
 

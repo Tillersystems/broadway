@@ -40,7 +40,7 @@ class Scenario
      *
      * @return Scenario
      */
-    public function given(array $events = array())
+    public function given(array $events = [])
     {
         foreach ($events as $given) {
             $this->sagaManager->handle($this->createDomainMessageForEvent($given));
@@ -78,7 +78,6 @@ class Scenario
     private function createDomainMessageForEvent($event)
     {
         $this->playhead++;
-
-        return DomainMessage::recordNow(1, $this->playhead, $this->playhead, 'shopId', new Metadata(array()), $event);
+        return DomainMessage::recordNow(1, $this->playhead, $this->playhead, 'shopId', new Metadata([]), $event);
     }
 }

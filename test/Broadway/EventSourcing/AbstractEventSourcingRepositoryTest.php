@@ -54,7 +54,7 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
         $this->eventStreamDecorator = new TraceableEventStoreDecorator();
         $this->eventStreamDecorator->trace();
 
-        $this->repository = $this->createEventSourcingRepository($this->eventStore, $this->eventBus, array($this->eventStreamDecorator));
+        $this->repository = $this->createEventSourcingRepository($this->eventStore, $this->eventBus, [$this->eventStreamDecorator]);
     }
 
     /**
@@ -69,10 +69,10 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
 
     public function objectsNotOfConfiguredClass()
     {
-        return array(
-            array(new TestAggregate()),
-            array(new AnotherTestEventSourcedAggregate()),
-        );
+        return [
+            [new TestAggregate()],
+            [new AnotherTestEventSourcedAggregate()],
+        ];
     }
 
     /**
@@ -86,7 +86,7 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
 
         $this->repository->save($aggregate);
 
-        $expected = array(new DidNumberEvent(42), new DidNumberEvent(1337));
+        $expected = [new DidNumberEvent(42), new DidNumberEvent(1337)];
         $this->assertEquals($expected, $this->eventStore->getEvents());
         $this->assertEquals($expected, $this->eventBus->getEvents());
     }
@@ -97,7 +97,7 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
     public function it_loads_an_aggregate()
     {
         $this->eventStore->append(42, new DomainEventStream(array(
-            DomainMessage::recordNow(42, 0, 33, 0, new Metadata(array()), new DidNumberEvent(1337), DateTime::now())
+            DomainMessage::recordNow(42, 0, 33, 0, new Metadata([]), new DidNumberEvent(1337), DateTime::now())
         )));
 
         $aggregate = $this->repository->load(42);
@@ -167,7 +167,7 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
             $this->eventBus,
             get_class($this->createAggregate()),
             new PublicConstructorAggregateFactory(),
-            array(new MetadataEnrichingEventStreamDecorator(array(new TestDecorationMetadataEnricher())))
+            [new MetadataEnrichingEventStreamDecorator([new TestDecorationMetadataEnricher()])]
         );
 
         $aggregate = $this->createAggregate();
@@ -245,7 +245,7 @@ class TraceableEventstoreDecorator implements EventStreamDecoratorInterface
     public function decorateForWrite($aggregateType, $aggregateIdentifier, DomainEventStreamInterface $eventStream)
     {
         if ($this->tracing) {
-            $this->calls[] = array('aggregateType' => $aggregateType, 'aggregateIdentifier' => $aggregateIdentifier, 'eventStream' => $eventStream);
+            $this->calls[] = ['aggregateType' => $aggregateType, 'aggregateIdentifier' => $aggregateIdentifier, 'eventStream' => $eventStream];
         }
 
         return $eventStream;
@@ -275,7 +275,7 @@ class TestDecorationMetadataEnricher implements MetadataEnricherInterface
 {
     public function enrich(Metadata $metadata)
     {
-        return new Metadata(array('decoration_test' => 'I am a decorated test'));
+        return new Metadata(['decoration_test' => 'I am a decorated test']);
     }
 }
 

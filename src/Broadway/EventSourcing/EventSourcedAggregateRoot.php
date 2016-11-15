@@ -26,7 +26,7 @@ abstract class EventSourcedAggregateRoot implements AggregateRootInterface
     /**
      * @var array
      */
-    private $uncommittedEvents = array();
+    private $uncommittedEvents = [];
     private $playhead          = -1; // 0-based playhead allows events[0] to contain playhead 0
 
     /**
@@ -57,7 +57,7 @@ abstract class EventSourcedAggregateRoot implements AggregateRootInterface
     {
         $stream = new DomainEventStream($this->uncommittedEvents);
 
-        $this->uncommittedEvents = array();
+        $this->uncommittedEvents = [];
 
         return $stream;
     }
@@ -107,11 +107,11 @@ abstract class EventSourcedAggregateRoot implements AggregateRootInterface
      *
      * Override this method if your aggregate root contains child entities.
      *
-     * @return array
+     * @return EventSourcedEntityInterface[]
      */
     protected function getChildEntities()
     {
-        return array();
+        return [];
     }
 
     private function getApplyMethod($event)

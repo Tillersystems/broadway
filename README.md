@@ -3,8 +3,66 @@ Broadway - Forked by Tiller
 
 **Do not use this fork.**
 
+<<<<<<< HEAD
 Use qandidate original repository :
 https://github.com/qandidate-labs/broadway
+=======
+> Note: while broadway is currently used in production, you should probably
+> know what you're doing. ;)
+
+[![Build Status](https://travis-ci.org/qandidate-labs/broadway.svg?branch=master)](https://travis-ci.org/qandidate-labs/broadway)
+
+Feel free to join #qandidate on freenode with questions and remarks!
+
+## About
+
+Read the blog post about this repository at:
+- http://labs.qandidate.com/blog/2014/08/26/broadway-our-cqrs-es-framework-open-sourced/
+
+## Installation
+
+```
+$ composer require broadway/broadway
+```
+
+## Examples
+
+Examples can be found in the [`examples/`][examples] directory. Most of the
+examples focus on showing how one of the components works. There is also a more
+[deliberate example][example] using several components and showing how you can
+test your event sourced model.
+
+[examples]: examples/
+[example]: examples/event-sourced-domain-with-tests/
+
+## Components
+
+Broadway consists of several components. Check out the README's of each
+component for more information.
+
+- [Auditing](src/Broadway/Auditing/)
+- [CommandHandling](src/Broadway/CommandHandling/)
+- [Domain](src/Broadway/Domain/)
+- [EventDispatcher](src/Broadway/EventDispatcher/)
+- [EventHandling](src/Broadway/EventHandling/)
+- [EventSourcing](src/Broadway/EventSourcing/)
+- [EventStore](src/Broadway/EventStore/)
+- [Processor](src/Broadway/Processor/)
+- [ReadModel](src/Broadway/ReadModel/)
+- [Repository](src/Broadway/Repository/)
+- [Saga](src/Broadway/Saga/)
+- [Serializer](src/Broadway/Serializer/)
+
+## Integrations
+
+- The broadway project ships with a [bundle] to use with a Symfony application.
+
+- A [Laravel package](https://github.com/nWidart/Laravel-broadway) is also available to allow the use of Broadway inside a Laravel application.
+
+Contributions for integrations with other projects are appreciated!
+
+[bundle]: src/Broadway/Bundle/
+>>>>>>> upstream/master
 
 ## Acknowledgements
 

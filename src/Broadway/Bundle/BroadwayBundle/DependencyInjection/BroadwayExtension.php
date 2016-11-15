@@ -15,7 +15,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -40,6 +39,7 @@ class BroadwayExtension extends Extension
         $this->loadReadModelRepository($config['read_model'], $container, $loader);
         $this->loadCommandBus($config['command_handling'], $container, $loader);
         $this->loadEventStore($config['event_store'], $container, $loader);
+        $this->loadSerializers($config['serializer'], $container, $loader);
     }
 
     private function loadCommandBus(array $config, ContainerBuilder $container, LoaderInterface $loader)
@@ -75,7 +75,6 @@ class BroadwayExtension extends Extension
                 $database = 'broadway_%kernel.environment%%broadway.saga.mongodb.storage_suffix%';
 
                 if (isset($config['mongodb']['connection'])) {
-
                     if (isset($config['mongodb']['connection']['database'])) {
                         $database = $config['mongodb']['connection']['database'];
                     }
@@ -151,13 +150,22 @@ class BroadwayExtension extends Extension
         );
     }
 
+    private function loadSerializers(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('serializers.xml');
+
+        foreach ($config as $serializer => $serviceId) {
+            $container->setParameter(sprintf('broadway.serializer.%s.service_id', $serializer), $serviceId);
+        }
+    }
+
     private function configElasticsearch(array $config, ContainerBuilder $container)
     {
         $definition = $container->findDefinition('broadway.elasticsearch.client');
 
-        $definition->setArguments(array(
+        $definition->setArguments([
              $config
-        ));
+        ]);
 
         $container->setAlias(
             'broadway.read_model.repository_factory',
