@@ -3,10 +3,10 @@ Broadway - Forked by Tiller
 
 **Do not use this fork.**
 
-<<<<<<< HEAD
 Use qandidate original repository :
 https://github.com/qandidate-labs/broadway
-=======
+
+
 > Note: while broadway is currently used in production, you should probably
 > know what you're doing. ;)
 
