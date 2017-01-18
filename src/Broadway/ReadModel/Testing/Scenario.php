@@ -121,6 +121,6 @@ class Scenario
             $occurredOn        = $dateTimeGenerator($event);
         }
 
-        return new DomainMessage($this->aggregateId, $this->playhead, new Metadata([]), $event, $occurredOn);
+        return new DomainMessage($this->aggregateId, $this->playhead, $this->aggregateId, '1', new Metadata([]), $event, $occurredOn, $occurredOn);
     }
 }
