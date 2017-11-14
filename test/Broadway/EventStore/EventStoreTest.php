@@ -29,11 +29,13 @@ abstract class EventStoreTest extends TestCase
      */
     public function it_creates_a_new_entry_when_id_is_new($id)
     {
+        $dateTime          = DateTime::fromString('2014-03-12T14:17:19.176169+00:00');
+        $happenedOn        = DateTime::fromString('2014-03-12T14:17:20.176169+00:00');
         $domainEventStream = new DomainEventStream([
-            $this->createDomainMessage($id, 0),
-            $this->createDomainMessage($id, 1),
-            $this->createDomainMessage($id, 2),
-            $this->createDomainMessage($id, 3),
+            $this->createDomainMessage($id, 0, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 1, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 2, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 3, $dateTime, $happenedOn),
         ]);
 
         $this->eventStore->append($id, $domainEventStream);
@@ -48,28 +50,29 @@ abstract class EventStoreTest extends TestCase
     public function it_appends_to_an_already_existing_stream($id)
     {
         $dateTime          = DateTime::fromString('2014-03-12T14:17:19.176169+00:00');
+        $happenedOn        = DateTime::fromString('2014-03-12T14:17:20.176169+00:00');
         $domainEventStream = new DomainEventStream([
-            $this->createDomainMessage($id, 0, $dateTime),
-            $this->createDomainMessage($id, 1, $dateTime),
-            $this->createDomainMessage($id, 2, $dateTime),
+            $this->createDomainMessage($id, 0, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 1, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 2, $dateTime, $happenedOn),
         ]);
         $this->eventStore->append($id, $domainEventStream);
         $appendedEventStream = new DomainEventStream([
-            $this->createDomainMessage($id, 3, $dateTime),
-            $this->createDomainMessage($id, 4, $dateTime),
-            $this->createDomainMessage($id, 5, $dateTime),
+            $this->createDomainMessage($id, 3, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 4, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 5, $dateTime, $happenedOn),
 
         ]);
 
         $this->eventStore->append($id, $appendedEventStream);
 
         $expected = new DomainEventStream([
-            $this->createDomainMessage($id, 0, $dateTime),
-            $this->createDomainMessage($id, 1, $dateTime),
-            $this->createDomainMessage($id, 2, $dateTime),
-            $this->createDomainMessage($id, 3, $dateTime),
-            $this->createDomainMessage($id, 4, $dateTime),
-            $this->createDomainMessage($id, 5, $dateTime),
+            $this->createDomainMessage($id, 0, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 1, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 2, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 3, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 4, $dateTime, $happenedOn),
+            $this->createDomainMessage($id, 5, $dateTime, $happenedOn),
         ]);
         $this->assertEquals($expected, $this->eventStore->load($id));
     }
@@ -142,9 +145,9 @@ abstract class EventStoreTest extends TestCase
         ];
     }
 
-    protected function createDomainMessage($id, $privateId, $recordedOn = null)
+    protected function createDomainMessage($id, $privateId, $recordedOn = null, $happenedOn = null)
     {
-        return new DomainMessage($id, $privateId, $privateId, 'shopId', new MetaData(array()), new Event(), DateTime::now(), $recordedOn ? $recordedOn : DateTime::now());
+        return new DomainMessage($id, $privateId, $privateId, 'shopId', new MetaData(array()), new Event(), $happenedOn ? $happenedOn : DateTime::now(), $recordedOn ? $recordedOn : DateTime::now());
     }
 }
 

@@ -250,7 +250,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     {
 
         list ($where, $bindValues, $bindValueTypes) = $this->prepareVisitEventsStatementWhereAndBindValues($criteria);
-        $query = 'SELECT uuid, playhead, private_id, shop_id, metadata, payload, happened_on, recorded_on
+        $query = 'SELECT uuid, playhead, private_uuid, shop_id, metadata, payload, happened_on, recorded_on
             FROM ' . $this->tableName . '
             ' . $where . '
             ORDER BY id ASC';
