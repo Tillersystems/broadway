@@ -30,11 +30,17 @@ abstract class EventStoreManagementTest extends TestCase
     /**
      * @var DateTime
      */
-    protected $now;
+    protected $happenedOn;
+
+    /**
+     * @var DateTime
+     */
+    protected $receordedOn;
 
     public function setUp()
     {
-        $this->now        = DateTime::now();
+        $this->happenedOn = DateTime::fromString("2017-11-11T14:00:00");
+        $this->receordedOn = DateTime::fromString("2017-11-11T15:00:00");
         $this->eventStore = $this->createEventStore();
         $this->createAndInsertEventFixtures();
         $this->eventVisitor = new RecordingEventVisitor();
@@ -171,7 +177,7 @@ abstract class EventStoreManagementTest extends TestCase
     {
         $id = $this->getId($id);
 
-        return new DomainMessage((string) $id, (string) $privateId, (string) $privateId, 'shopId', new Metadata(array()), $event, $this->now, $this->now);
+        return new DomainMessage((string) $id, (string) $privateId, (string) $privateId, 'shopId', new Metadata(array()), $event, $this->happenedOn, $this->receordedOn);
 
     }
 
