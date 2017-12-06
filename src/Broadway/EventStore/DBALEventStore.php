@@ -172,7 +172,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
         $table->addColumn('type', 'text');
 
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['uuid', 'playhead', 'private_uuid', 'shop_id']);
+        $table->addUniqueIndex(['uuid', 'private_uuid', 'shop_id']);
 
         return $table;
     }
