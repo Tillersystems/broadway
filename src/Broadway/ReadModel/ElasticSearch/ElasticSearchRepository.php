@@ -181,7 +181,7 @@ class ElasticSearchRepository implements RepositoryInterface
     {
         return [
             'bool' => [
-                'must' => [
+                'should' => [
                     $this->buildFilter($fields)
                 ]
             ],
