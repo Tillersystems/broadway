@@ -180,12 +180,11 @@ class ElasticSearchRepository implements RepositoryInterface
     private function buildFindByQuery(array $fields)
     {
         return [
-            'filtered' => [
-                'query' => [
-                    'match_all' => [],
-                ],
-                'filter' => $this->buildFilter($fields)
-            ]
+            'bool' => [
+                'must' => [
+                    $this->buildFilter($fields)
+                ]
+            ],
         ];
     }
 
@@ -219,7 +218,7 @@ class ElasticSearchRepository implements RepositoryInterface
             $retval[] = ['term' => [$field => $value]];
         }
 
-        return ['and' => $retval];
+        return $retval;
     }
 
     /**
