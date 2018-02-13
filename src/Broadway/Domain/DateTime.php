@@ -111,6 +111,13 @@ class DateTime
         return $this->dateTime->diff($dateTime->dateTime);
     }
 
+    public function setTimezone(DateTimeZone $timezone)
+    {
+        $datetime = $this->dateTime->setTimezone($timezone);
+
+        return new self($datetime);
+    }
+
     /**
      * @return DateTime
      */
