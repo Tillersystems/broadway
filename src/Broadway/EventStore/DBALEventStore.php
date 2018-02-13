@@ -111,6 +111,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
 
     private function insertMessage(Connection $connection, DomainMessage $domainMessage)
     {
+        $timezone = new \DateTimeZone("UTC");
 
         $data = [
             'uuid' => $this->convertIdentifierToStorageValue((string) $domainMessage->getId()),
@@ -119,8 +120,8 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
             'shop_id' => $domainMessage->getShopId(),
             'metadata' => json_encode($this->metadataSerializer->serialize($domainMessage->getMetadata())),
             'payload' => json_encode($this->payloadSerializer->serialize($domainMessage->getPayload())),
-            'happened_on' => $domainMessage->getHappenedOn()->toString(),
-            'recorded_on' => $domainMessage->getRecordedOn()->toString(),
+            'happened_on' => $domainMessage->getHappenedOn()->setTimezone($timezone)->toString(),
+            'recorded_on' => $domainMessage->getRecordedOn()->setTimezone($timezone)->toString(),
             'type' => $domainMessage->getType(),
         ];
 

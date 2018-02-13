@@ -112,6 +112,17 @@ class DateTime
     }
 
     /**
+     * @param DateTimeZone $timezone
+     * @return DateTime
+     */
+    public function setTimezone(DateTimeZone $timezone)
+    {
+        $datetime = $this->dateTime->setTimezone($timezone);
+
+        return new self($datetime);
+    }
+
+    /**
      * @return DateTime
      */
     public function toBeginningOfWeek()
