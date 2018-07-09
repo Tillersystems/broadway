@@ -102,6 +102,6 @@ class InMemoryRepository implements RepositoryInterface, TransferableInterface
      */
     public function query(array $query)
     {
-        return $this->find($query['bool']['must']['match']['shopId']);
+        return $this->findBy(['shopId' => $query['bool']['must']['match']['shopId']]);
     }
 }
