@@ -41,4 +41,9 @@ interface RepositoryInterface
      * @param string $id
      */
     public function remove($id);
+
+    /**
+     * @param array $query
+     */
+    public function query(array $query);
 }

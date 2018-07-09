@@ -25,7 +25,7 @@ class InMemoryRepository implements RepositoryInterface, TransferableInterface
     private $data = [];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function save(ReadModelInterface $model)
     {
@@ -33,7 +33,7 @@ class InMemoryRepository implements RepositoryInterface, TransferableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function find($id)
     {
@@ -46,23 +46,23 @@ class InMemoryRepository implements RepositoryInterface, TransferableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function findBy(array $fields)
     {
-        if (! $fields) {
+        if (!$fields) {
             return [];
         }
 
         return array_values(array_filter($this->data, function ($model) use ($fields) {
             foreach ($fields as $field => $value) {
-                $getter = 'get' . ucfirst($field);
+                $getter = 'get'.ucfirst($field);
 
                 $modelValue = $model->$getter();
 
-                if (is_array($modelValue) && ! in_array($value, $modelValue)) {
+                if (is_array($modelValue) && !in_array($value, $modelValue)) {
                     return false;
-                } elseif (! is_array($modelValue) && $modelValue !== $value) {
+                } elseif (!is_array($modelValue) && $modelValue !== $value) {
                     return false;
                 }
             }
@@ -72,7 +72,7 @@ class InMemoryRepository implements RepositoryInterface, TransferableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function findAll()
     {
@@ -80,7 +80,7 @@ class InMemoryRepository implements RepositoryInterface, TransferableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function transferTo(RepositoryInterface $otherRepository)
     {
@@ -90,10 +90,18 @@ class InMemoryRepository implements RepositoryInterface, TransferableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function remove($id)
     {
         unset($this->data[(string) $id]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function query(array $query)
+    {
+        return $this->find($query['bool']['must']['match']['shopId']);
     }
 }
