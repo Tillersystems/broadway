@@ -22,12 +22,12 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('broadway');
+        $rootNode = $treeBuilder->root('broadway');
 
         $rootNode
             ->children()
@@ -59,7 +59,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->booleanNode('enabled')
-                                    ->defaultTrue()
+                                    ->defaultFalse()
                                 ->end()
                                 ->scalarNode('table')
                                     ->defaultValue('events')
@@ -80,6 +80,33 @@ class Configuration implements ConfigurationInterface
 
                                             return $v;
                                         })
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('dynamo')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('enabled')
+                                    ->defaultTrue()
+                                ->end()
+                                ->scalarNode('table')
+                                    ->defaultValue('events')
+                                ->end()
+                                ->arrayNode('connection')
+                                    ->children()
+                                        ->scalarNode('version')
+                                        ->end()
+                                        ->scalarNode('region')
+                                        ->end()
+                                        ->arrayNode('credentials')
+                                            ->children()
+                                                ->scalarNode('key')
+                                                ->end()
+                                                ->scalarNode('secret')
+                                                ->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
                                 ->end()
                             ->end()

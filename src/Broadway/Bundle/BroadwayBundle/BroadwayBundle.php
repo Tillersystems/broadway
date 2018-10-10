@@ -14,6 +14,7 @@ namespace Broadway\Bundle\BroadwayBundle;
 use Broadway\Bundle\BroadwayBundle\Command\SchemaEventStoreCreateCommand;
 use Broadway\Bundle\BroadwayBundle\Command\SchemaEventStoreDropCommand;
 use Broadway\Bundle\BroadwayBundle\DependencyInjection\DefineDBALEventStoreConnectionCompilerPass;
+use Broadway\Bundle\BroadwayBundle\DependencyInjection\DefineDynamoEventStoreConnectionCompilerPass;
 use Broadway\Bundle\BroadwayBundle\DependencyInjection\RegisterBusSubscribersCompilerPass;
 use Broadway\Bundle\BroadwayBundle\DependencyInjection\RegisterEventListenerCompilerPass;
 use Broadway\Bundle\BroadwayBundle\DependencyInjection\RegisterMetadataEnricherSubscriberPass;
@@ -29,7 +30,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class BroadwayBundle extends Bundle
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function build(ContainerBuilder $container)
     {
@@ -71,12 +72,15 @@ class BroadwayBundle extends Bundle
             new DefineDBALEventStoreConnectionCompilerPass($this->getContainerExtension()->getAlias())
         );
         $container->addCompilerPass(
+            new DefineDynamoEventStoreConnectionCompilerPass()
+        );
+        $container->addCompilerPass(
             new RegisterSerializersCompilerPass()
         );
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function registerCommands(Application $application)
     {

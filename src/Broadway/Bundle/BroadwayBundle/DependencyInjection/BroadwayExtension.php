@@ -23,14 +23,14 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class BroadwayExtension extends Extension
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $configuration = $this->getConfiguration($configs, $container);
-        $config        = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration($configuration, $configs);
 
         $loader->load('services.xml');
         $loader->load('saga.xml');
@@ -92,6 +92,7 @@ class BroadwayExtension extends Extension
 
                 $container->setParameter('broadway.saga.mongodb.storage_suffix', (string) $config['mongodb']['storage_suffix']);
                 $container->setParameter('broadway.saga.mongodb.database', $database);
+
                 break;
             case 'in_memory':
                 $loader->load('saga/in_memory.xml');
@@ -99,6 +100,7 @@ class BroadwayExtension extends Extension
                     'broadway.saga.state.repository',
                     'broadway.saga.state.in_memory_repository'
                 );
+
                 break;
         }
     }
@@ -109,10 +111,12 @@ class BroadwayExtension extends Extension
             case 'elasticsearch':
                 $loader->load('read_model/elasticsearch.xml');
                 $this->configElasticsearch($config['elasticsearch'], $container);
+
                 break;
             case 'in_memory':
                 $loader->load('read_model/in_memory.xml');
                 $this->configInMemory($container);
+
                 break;
         }
     }
@@ -124,15 +128,14 @@ class BroadwayExtension extends Extension
         if ($config['dbal']['enabled']) {
             $this->loadDBALEventStore($config, $container, $loader);
         }
+        if ($config['dynamo']['enabled']) {
+            $this->loadDynamoEventStore($config, $container, $loader);
+        }
     }
 
     private function loadDBALEventStore(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('event_store_dbal.xml');
-        $container->setAlias(
-            'broadway.event_store',
-            'broadway.event_store.dbal'
-        );
 
         $container->setParameter(
             'broadway.event_store.dbal.connection',
@@ -150,6 +153,25 @@ class BroadwayExtension extends Extension
         );
     }
 
+    private function loadDynamoEventStore(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('event_store_dynamo.xml');
+        $container->setAlias(
+            'broadway.event_store',
+            'broadway.event_store.dynamo'
+        );
+
+        $container->setParameter(
+            'broadway.event_store.dynamo.connection',
+            $config['dynamo']['connection']
+        );
+
+        $container->setParameter(
+            'broadway.event_store.dynamo.table',
+            $config['dynamo']['table']
+        );
+    }
+
     private function loadSerializers(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('serializers.xml');
@@ -164,7 +186,7 @@ class BroadwayExtension extends Extension
         $definition = $container->findDefinition('broadway.elasticsearch.client');
 
         $definition->setArguments([
-             $config
+             $config,
         ]);
 
         $container->setAlias(
