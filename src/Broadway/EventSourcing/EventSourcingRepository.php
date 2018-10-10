@@ -48,15 +48,15 @@ class EventSourcingRepository implements RepositoryInterface
     ) {
         $this->assertExtendsEventSourcedAggregateRoot($aggregateClass);
 
-        $this->eventStore            = $eventStore;
-        $this->eventBus              = $eventBus;
-        $this->aggregateClass        = $aggregateClass;
-        $this->aggregateFactory      = $aggregateFactory;
+        $this->eventStore = $eventStore;
+        $this->eventBus = $eventBus;
+        $this->aggregateClass = $aggregateClass;
+        $this->aggregateFactory = $aggregateFactory;
         $this->eventStreamDecorators = $eventStreamDecorators;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load($id)
     {
@@ -70,7 +70,7 @@ class EventSourcingRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function save(AggregateRoot $aggregate)
     {
@@ -78,14 +78,14 @@ class EventSourcingRepository implements RepositoryInterface
         Assert::isInstanceOf($aggregate, $this->aggregateClass);
 
         $domainEventStream = $aggregate->getUncommittedEvents();
-        $eventStream       = $this->decorateForWrite($aggregate, $domainEventStream);
+        $eventStream = $this->decorateForWrite($aggregate, $domainEventStream);
         $this->eventStore->append($aggregate->getAggregateRootId(), $eventStream);
         $this->eventBus->publish($eventStream);
     }
 
-    private function decorateForWrite(AggregateRoot $aggregate, DomainEventStream $eventStream)
+    protected function decorateForWrite(AggregateRoot $aggregate, DomainEventStream $eventStream)
     {
-        $aggregateType       = $this->getType();
+        $aggregateType = $this->getType();
         $aggregateIdentifier = $aggregate->getAggregateRootId();
 
         foreach ($this->eventStreamDecorators as $eventStreamDecorator) {
@@ -95,7 +95,7 @@ class EventSourcingRepository implements RepositoryInterface
         return $eventStream;
     }
 
-    private function assertExtendsEventSourcedAggregateRoot($class)
+    protected function assertExtendsEventSourcedAggregateRoot($class)
     {
         Assert::subclassOf(
             $class,
@@ -104,7 +104,7 @@ class EventSourcingRepository implements RepositoryInterface
         );
     }
 
-    private function getType()
+    protected function getType()
     {
         return $this->aggregateClass;
     }

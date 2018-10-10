@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="broadway.event_store.dynamo" class="Broadway\EventStore\DynamoEventStore">
+            <argument type="service" id="broadway.event_store.dynamo.connection" />
+            <argument type="service" id="broadway.serializer.payload" />
+            <argument type="service" id="broadway.serializer.metadata" />
+            <argument>%broadway.event_store.dynamo.table%</argument>
+        </service>
+    </services>
+</container>
