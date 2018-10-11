@@ -7,6 +7,7 @@ use Broadway\Domain\DateTime;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainEventStreamInterface;
 use Broadway\Domain\DomainMessage;
+use Broadway\Domain\Metadata;
 use Broadway\Serializer\SerializerInterface;
 
 /**
@@ -38,6 +39,7 @@ class DynamoEventStore implements EventStoreInterface
     {
         $iterator = $this->dynamoDbClient->getIterator('Query', [
             'TableName' => $this->tableName,
+            'IndexName' => 'RootUUIDIndex',
             'KeyConditions' => [
                 'rootUUID' => [
                     'AttributeValueList' => [
@@ -47,6 +49,7 @@ class DynamoEventStore implements EventStoreInterface
                 ],
             ],
         ]);
+
         foreach ($iterator as $row) {
             $events[] = $this->deserializeEvent($row);
         }
@@ -117,17 +120,17 @@ class DynamoEventStore implements EventStoreInterface
      */
     private function deserializeEvent($row): DomainMessage
     {
-        $className = sprintf('AppBundle\Event\%s', ucwords($row['type']));
+        $className = sprintf('AppBundle\Event\%s', ucwords($row['type']['S']));
 
         return new DomainMessage(
-            $row['rootUUID'],
-            $row['playhead'],
-            $row['uuid'],
-            $row['shop_id'],
+            $row['rootUUID']['S'],
+            $row['playhead']['N'],
+            $row['uuid']['S'],
+            $row['shopID']['N'],
             new MetaData([]),
-            ($className)::deserialize(json_decode($row['payload'], true)),
-            DateTime::fromString($row['happened_on']),
-            DateTime::fromString($row['recorded_on'])
+            ($className)::deserialize(json_decode($row['payload']['S'], true)),
+            DateTime::fromString($row['happenedOn']['S']),
+            DateTime::fromString($row['recordedOn']['S'])
         );
     }
 }
