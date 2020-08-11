@@ -130,8 +130,10 @@ class DynamoEventStore implements EventStoreInterface
             'date' => $row['happenedOn']['S'],
             'deviceUUID' => $row['deviceUUID']['S'],
             'deviceID' => $row['deviceID']['N'],
-            'isTraining' => false,
         ]);
+
+        $data['extraData'] = $data['extraData'] ?? [];
+        $data['isTraining'] = $event['isTraining'] ?? true === json_decode($row['source']['S'], true)['is_training'];
 
         return new DomainMessage(
             $row['rootUUID']['S'],
