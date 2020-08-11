@@ -129,7 +129,7 @@ class DynamoEventStore implements EventStoreInterface
             'shopId' => $row['shopID']['N'],
             'date' => $row['happenedOn']['S'],
             'deviceUUID' => $row['deviceUUID']['S'],
-            'deviceID' => $row['deviceID']['S'],
+            'deviceID' => $row['deviceID']['N'],
             'isTraining' => false,
         ]);
 
