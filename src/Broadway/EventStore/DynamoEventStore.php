@@ -123,13 +123,25 @@ class DynamoEventStore implements EventStoreInterface
     {
         $className = sprintf('AppBundle\Event\%s', ucwords($row['type']['S']));
 
+        $data = array_merge(json_decode($row['payload']['S'], true), [
+            'rootUUID' => $row['rootUUID']['S'],
+            'eventId' => $row['uuid']['S'],
+            'shopId' => $row['shopID']['N'],
+            'date' => $row['happenedOn']['S'],
+            'deviceUUID' => $row['deviceUUID']['S'],
+            'deviceID' => $row['deviceID']['N'],
+        ]);
+
+        $data['extraData'] = $data['extraData'] ?? [];
+        $data['isTraining'] = $event['isTraining'] ?? true === json_decode($row['source']['S'], true)['is_training'];
+
         return new DomainMessage(
             $row['rootUUID']['S'],
             $row['playhead']['N'],
             $row['uuid']['S'],
             $row['shopID']['N'],
             new MetaData([]),
-            ($className)::deserialize(json_decode($row['payload']['S'], true)),
+            ($className)::deserialize($data),
             DateTime::fromString($row['happenedOn']['S']),
             DateTime::fromString($row['recordedOn']['S'])
         );
