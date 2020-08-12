@@ -67,12 +67,10 @@ class DynamoEventStore implements EventStoreInterface
     public function append($id, DomainEventStreamInterface $eventStream)
     {
         if (0 !== iterator_count($eventStream)) {
-            $putRequests = [];
             foreach ($eventStream as $domainMessage) {
-                $putRequests[] = $this->prepareEvent($domainMessage);
+                $putRequest = $this->prepareEvent($domainMessage);
+                $this->flushToDynamo($putRequest);
             }
-
-            $this->flushToDynamo($putRequests);
         }
     }
 
@@ -87,32 +85,27 @@ class DynamoEventStore implements EventStoreInterface
         $event = $domainMessage->getPayload();
 
         return [
-            'PutRequest' => [
-                'Item' => [
-                    'rootUUID' => ['S' => $event->getRootUUID()],
-                    'uuid' => ['S' => $event->getEventId()],
-                    'shopID' => ['N' => (string) $event->getShopId()],
-                    'deviceID' => empty($event->getDeviceId()) ? ['N' => '-1'] : ['N' => (string) $event->getDeviceId()],
-                    'deviceUUID' => empty($event->getDeviceUUID()) ? ['NULL' => true] : ['S' => $event->getDeviceUUID()],
-                    'happenedOn' => ['S' => null !== $event->getHappenedOn() ? $event->getHappenedOn()->toString() : DateTime::now()->toString()],
-                    'playhead' => ['N' => (string) $domainMessage->getPlayhead()],
-                    'recordedOn' => ['S' => $domainMessage->getRecordedOn()->toString()],
-                    'type' => ['S' => (new \ReflectionClass($event))->getShortName()],
-                    'payload' => ['S' => json_encode($event->serialize())],
-                ],
-            ],
+            'rootUUID' => ['S' => $event->getRootUUID()],
+            'uuid' => ['S' => $event->getEventId()],
+            'shopID' => ['N' => (string) $event->getShopId()],
+            'deviceID' => empty($event->getDeviceId()) ? ['N' => '-1'] : ['N' => (string) $event->getDeviceId()],
+            'deviceUUID' => empty($event->getDeviceUUID()) ? ['NULL' => true] : ['S' => $event->getDeviceUUID()],
+            'happenedOn' => ['S' => null !== $event->getHappenedOn() ? $event->getHappenedOn()->toString() : DateTime::now()->toString()],
+            'playhead' => ['N' => (string) $domainMessage->getPlayhead()],
+            'recordedOn' => ['S' => $domainMessage->getRecordedOn()->toString()],
+            'type' => ['S' => (new \ReflectionClass($event))->getShortName()],
+            'payload' => ['S' => json_encode($event->serialize())],
         ];
     }
 
     /**
      * @param array putRequests
      */
-    private function flushToDynamo(array $putRequests)
+    private function flushToDynamo(array $putRequest)
     {
-        $this->dynamoDbClient->batchWriteItem([
-            'RequestItems' => [
-                $this->tableName => $putRequests,
-            ],
+        $this->dynamoDbClient->putItem([
+            'TableName' => $this->tableName,
+            'Item' => $putRequest,
         ]);
     }
 
